@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  postgreshydra:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=accesscontroldb
+    networks:
+      - intranet_hydra
+  hydra:
+    image: oryd/hydra:latest
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
+    command:
+      serve all --dangerous-force-http
+    environment:
+      - URLS_SELF_ISSUER=http://localhost:4444/
+      - URLS_CONSENT=http://localhost:3000/consent
+      - URLS_LOGIN=http://localhost:3000/login
+      - URLS_LOGOUT=http://localhost:3000/logout
+      - LOG_LEAK_SENSITIVE_VALUES=true
+      - DSN=postgres://dbuser:secret@postgreshydra:5432/accesscontroldb?sslmode=disable&max_conns=20&max_idle_conns=4
+      - SECRETS_SYSTEM=youReallyNeedToChangeThis
+      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
+      - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
+    restart: unless-stopped
+    networks:
+      - intranet_hydra
+  hydra-migrate:
+    image: oryd/hydra:latest
+    environment:
+      - DSN=postgres://dbuser:secret@postgreshydra:5432/accesscontroldb?sslmode=disable&max_conns=20&max_idle_conns=4
+    command:
+      migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - intranet_hydra
+
+networks:
+  intranet_hydra:
+    driver: bridge

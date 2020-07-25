@@ -1,0 +1,78 @@
+version: "3.8"
+services:
+  postgresservice:
+    container_name: postgres_container
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: nestjsbase
+      PGDATA: /Users/volumes/postgres
+    volumes:
+      - postgres-data:/Users/volumes/postgres
+    ports:
+      - "9432:5432"
+    restart: unless-stopped
+    networks:
+      - intranet_hydra
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
+    networks:
+      - intranet_hydra
+
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: main
+    container_name: main
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TYPEORM_CONNECTION=$TYPEORM_CONNECTION
+      - TYPEORM_HOST=$TYPEORM_HOST
+      - TYPEORM_USERNAME=$TYPEORM_USERNAME
+      - TYPEORM_PASSWORD=$TYPEORM_PASSWORD
+      - TYPEORM_DATABASE=$TYPEORM_DATABASE
+      - TYPEORM_PORT=$TYPEORM_PORT
+      - TYPEORM_LOGGING=$TYPEORM_LOGGING
+      - TYPEORM_SYNCHRONIZE=$TYPEORM_SYNCHRONIZE
+      - TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR
+      - TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS
+
+      - HYDRA_PUBLIC_URL=$HYDRA_PUBLIC_URL
+      - HYDRA_ADMIN_URL=$HYDRA_ADMIN_URL
+      - HYDRA_AUTHORIZATION_SERVER_URL=$HYDRA_AUTHORIZATION_SERVER_URL
+      - HYDRA_CALLBACK_URL=$HYDRA_CALLBACK_URL
+      - HYDRA_TOKEN_URL=$HYDRA_TOKEN_URL
+      - HYDRA_AUTH_URL=$HYDRA_AUTH_URL
+      - HYDRA_CLIENT_ID=$HYDRA_CLIENT_ID
+      - HYDRA_SECRET=$HYDRA_SECRET
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgresservice
+    networks:
+      - intranet_hydra
+
+
+volumes:
+  postgres-data:
+  pgadmin:
+
+networks:
+  intranet_hydra:
+    driver: bridge
+
+# explore inside main docker
+# docker exec -t -i main ls -lrt /home/node
