@@ -9,7 +9,7 @@ export class ConsentConfirmDomain {
   submit: string;
 
   @IsNotEmpty()
-  grant_scope: string | [];
+  grant_scope: any;
 
   @IsOptional()
   @IsString()

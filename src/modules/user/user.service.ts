@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { ConflictException, HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ConflictException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository} from 'typeorm';
 import { User } from './user.entity';
@@ -13,21 +13,10 @@ export class UserService {
     private readonly userRepository: Repository<User>
   ) {}
 
-  async get(id: number) {
-    return this.userRepository.findOne(id);
-  }
-
   async getByEmail(email: string): Promise<User> {
     return await this.userRepository.createQueryBuilder('users')
       .where('users.email = :email')
       .setParameter('email', email)
-      .getOne();
-  }
-
-  async getByConfirmationToken(token: string): Promise<User> {
-    return await this.userRepository.createQueryBuilder('users')
-      .where('users.confirmation_token = :token')
-      .setParameter('token', token)
       .getOne();
   }
 
@@ -46,7 +35,7 @@ export class UserService {
       throw new NotAcceptableException('User with provided email already created.');
     }
     const user = await this.userRepository.create(payload);
-    user.password = 'changeme';
+    user.password = payload.password;
     try {
       return await this.save(user);
     } catch (error) {

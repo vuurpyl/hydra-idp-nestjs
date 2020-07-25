@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  postgresservice:
+  postgresidp:
     container_name: postgres_container
     image: postgres:latest
     environment:
@@ -61,7 +61,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgresservice
+      - postgresidp
     networks:
       - intranet_hydra
 

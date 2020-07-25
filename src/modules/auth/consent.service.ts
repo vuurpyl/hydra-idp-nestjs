@@ -15,7 +15,6 @@ export class ConsentService {
       error_description: errorDescription,
     };
     const { redirect_to } = await this.hydraService.rejectConsentRequest(challenge, errorBody);
-
     return redirect_to;
   }
 

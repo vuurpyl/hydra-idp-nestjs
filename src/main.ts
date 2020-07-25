@@ -2,20 +2,18 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/main/app.module';
 import { setupSwagger } from './swagger';
-import { BadRequestExceptionFilter } from './shared/exceptions/filters/bad.request.exception.filter';
-import { ResourceNotFoundExceptionFilter } from './shared/exceptions/filters/resource.not.found.exception.filter';
-import { TimeoutInterceptor } from './shared/timeout.interceptor';
+import { TimeoutInterceptor } from './shared/interceptors/timeout.interceptor';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   setupSwagger(app);
   app.useGlobalFilters(
-    new BadRequestExceptionFilter(),
-    new ResourceNotFoundExceptionFilter(),
+    new HttpExceptionFilter()
   );
   app.use(helmet());
   app.enableCors();

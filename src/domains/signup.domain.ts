@@ -17,8 +17,6 @@ export class SignupDomain {
 
   @ApiModelProperty({ required: true })
   @IsString()
-  @MinLength(8, { message: 'Password is too short' })
-  @MaxLength(50, { message: 'Password is too long' })
   password: string;
 
   @ApiModelProperty({ required: true })

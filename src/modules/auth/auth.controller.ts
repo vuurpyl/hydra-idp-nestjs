@@ -1,7 +1,5 @@
-import { Controller, Body, Post, UseGuards, Get, Request, Req, Res, Query } from '@nestjs/common';
-import { ApiResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { SignupDomain } from '../../domains/signup.domain';
-import { User } from '../user/user.entity';
+import { Controller, Body, Post, Get, Request, Req, Res, Query } from '@nestjs/common';
+import { ApiResponse, ApiBearerAuth} from '@nestjs/swagger';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { ConsentConfirmDomain } from '../../domains/consent.confirm.domain';
@@ -36,15 +34,7 @@ export class AuthController {
         await this.consentService.acceptConsentRequest(challenge, {
           grant_scope: response.requested_scope,
           grant_access_token_audience: response.requested_access_token_audience,
-
-          // The session allows us to set session data for id and access tokens
-          session: {
-            // This data will be available when introspecting the token. Try to avoid sensitive information here,
-            // unless you limit who can introspect tokens.
-            // access_token: { foo: 'bar' },
-            // This data will be available in the ID token.
-            // id_token: { baz: 'bar' },
-          },
+          session: {},
         }),
       );
     }
@@ -73,16 +63,14 @@ export class AuthController {
     }
 
     const response = await this.consentService.getConsentRequest(challenge);
-
-    return res.redirect(
-      await this.consentService.acceptConsentRequest(challenge, {
-        grant_scope,
-        session: {},
-        grant_access_token_audience: response.requested_access_token_audience,
-        remember: Boolean(remember),
-        remember_for: 3600,
-      }),
-    );
+    const body = {
+      grant_scope,
+      session: {},
+      grant_access_token_audience: response.requested_access_token_audience,
+      remember: Boolean(remember),
+      remember_for: 3600,
+    };
+    return res.redirect(await this.consentService.acceptConsentRequest(challenge, body));
   }
 
   @Get('login')
@@ -99,13 +87,13 @@ export class AuthController {
   @Post('login')
   async loginWithCredentials(@Body() credentialsDto: LoginDomain, @Req() req, @Res() res) {
     const { email, password, challenge, remember } = credentialsDto;
-
-    if (!(email === 'foo@bar.com' && password === 'foobar')) {
+    try{
+      await this.userService.getByEmailAndPass(email, password);
+      return res.redirect(
+        await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)),
+      );
+    }catch(error){
       return res.render('login', { challenge, error: 'The username / password combination is not correct' });
     }
-
-    return res.redirect(
-      await this.loginService.acceptLoginRequestAndRemember(challenge, `foo@bar.com`, Boolean(remember)),
-    );
   }
 }
