@@ -86,16 +86,13 @@ export class AuthController {
 
   @Post('login')
   async loginWithCredentials(@Body() credentialsDto: LoginDomain, @Req() req, @Res() res) {
-    console.log('dto login : ', credentialsDto)
     const { email, password, challenge, remember } = credentialsDto;
     try{
-      const user = await this.authService.validateUser(email, password);
-      console.log('user', user)
+      await this.userService.getByEmailAndPass(email, password);
       return res.redirect(
         await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)),
       );
     }catch(error){
-      console.log('err', error);
       return res.render('login', { challenge, error: 'The username / password combination is not correct' });
     }
   }

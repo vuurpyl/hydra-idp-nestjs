@@ -15,7 +15,6 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<User> {
     const foundUser = await this.userService.getByEmail(email);
-    console.log(email, password, foundUser);
     if (foundUser === undefined) {
       throw new UnauthorizedException('Wrong login combination!');
     }
