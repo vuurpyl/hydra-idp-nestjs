@@ -88,7 +88,7 @@ export class AuthController {
   async loginWithCredentials(@Body() credentialsDto: LoginDomain, @Req() req, @Res() res) {
     const { email, password, challenge, remember } = credentialsDto;
     try{
-      await this.userService.getByEmailAndPass(email, password);
+      const user = await this.authService.validateUser(email, password);
       return res.redirect(
         await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)),
       );
