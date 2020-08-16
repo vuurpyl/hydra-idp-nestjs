@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   postgreshydra:
-    image: postgres:9.6
+    image: postgres:latest
     ports:
       - "5432:5432"
     environment:

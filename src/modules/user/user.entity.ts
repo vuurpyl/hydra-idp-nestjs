@@ -1,13 +1,12 @@
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PasswordTransformer } from './password.transformer';
+import { Exclude } from 'class-transformer';
 
 @Entity({
   name: 'users',
 })
 export class User {
 
-  @Column({ unique: true })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ name: 'first_name' })
@@ -22,10 +21,8 @@ export class User {
   @Column()
   username: string;
 
-  @Column({
-    name: 'password',
-    transformer: new PasswordTransformer(),
-  })
+  @Column()
+  @Exclude()
   password: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

@@ -4,7 +4,7 @@ import { ConfigModule} from '@nestjs/config';
 import { HydraModule } from '../hydra/hydra.module';
 import { UserModule } from '../user/user.module';
 import { AuthService } from './auth.service';
-import { LoginService } from './login.service';
+import { SigninService } from './signin.service';
 import { ConsentService } from './consent.service';
 import { SignupController } from './signup.controller';
 
@@ -21,7 +21,7 @@ import { SignupController } from './signup.controller';
   ],
   providers: [
     AuthService,
-    LoginService,
+    SigninService,
     ConsentService
   ],
   exports: [

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { HydraService } from '../hydra/hydra.service';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -13,11 +14,21 @@ export class AuthService {
   ) { }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.userService.getByEmailAndPass(email, password);
-    if (!user) {
+    const foundUser = await this.userService.getByEmail(email);
+    console.log(email, password, foundUser);
+    if (foundUser === undefined) {
       throw new UnauthorizedException('Wrong login combination!');
     }
-    return user;
+
+    try {
+      if (await argon2.verify(foundUser.password, password)) {
+        return foundUser;
+      }
+    } catch (err) {
+      throw new UnauthorizedException('Error when verifying password');
+    }
+
+    throw new UnauthorizedException('Wrong login combination!');
   }
 
   async introspectToken(token): Promise<boolean> {

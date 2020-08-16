@@ -1,25 +1,23 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger/dist/decorators/api-model-property.decorator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class SignupDomain {
 
-  @ApiModelProperty({ required: true })
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
-  @ApiModelProperty({ required: true })
   @IsString()
+  @IsNotEmpty()
   firstName: string;
 
-  @ApiModelProperty({ required: true })
   @IsString()
+  @IsNotEmpty()
   lastName: string;
 
-  @ApiModelProperty({ required: true })
   @IsString()
+  @IsNotEmpty()
   password: string;
 
-  @ApiModelProperty({ required: true })
   @IsString()
   @MinLength(3, { message: 'Username is too short' })
   @MaxLength(50, { message: 'Username is too long' })

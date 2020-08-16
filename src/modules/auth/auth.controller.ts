@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { ConsentConfirmDomain } from '../../domains/consent.confirm.domain';
 import { ConsentService } from './consent.service';
-import { LoginService } from './login.service';
+import { SigninService } from './signin.service';
 import { LoginDomain } from '../../domains/login.domain';
 
 @Controller()
@@ -14,7 +14,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly consentService: ConsentService,
-    private readonly loginService: LoginService
+    private readonly loginService: SigninService
   ) {}
 
   @ApiBearerAuth()
@@ -86,13 +86,16 @@ export class AuthController {
 
   @Post('login')
   async loginWithCredentials(@Body() credentialsDto: LoginDomain, @Req() req, @Res() res) {
+    console.log('dto login : ', credentialsDto)
     const { email, password, challenge, remember } = credentialsDto;
     try{
-      await this.userService.getByEmailAndPass(email, password);
+      const user = await this.authService.validateUser(email, password);
+      console.log('user', user)
       return res.redirect(
         await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)),
       );
     }catch(error){
+      console.log('err', error);
       return res.render('login', { challenge, error: 'The username / password combination is not correct' });
     }
   }

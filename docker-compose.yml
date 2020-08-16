@@ -7,9 +7,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: nestjsbase
-      PGDATA: /Users/volumes/postgres
     volumes:
-      - postgres-data:/Users/volumes/postgres
+      - ./db:/var/lib/postgres
     ports:
       - "9432:5432"
     restart: unless-stopped
@@ -67,7 +66,6 @@ services:
 
 
 volumes:
-  postgres-data:
   pgadmin:
 
 networks:

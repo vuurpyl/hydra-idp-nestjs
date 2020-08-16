@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HydraService } from '../hydra/hydra.service';
 
 @Injectable()
-export class LoginService {
+export class SigninService {
   constructor(private readonly hydraService: HydraService) {}
 
   async getLoginRequest(challenge: string) {
