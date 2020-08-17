@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Request, Req, Res, Query } from '@nestjs/common';
+import { Controller, Body, Post, Get, Request, Req, Res, Query, UsePipes } from '@nestjs/common';
 import { ApiResponse, ApiBearerAuth} from '@nestjs/swagger';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -6,6 +6,7 @@ import { ConsentConfirmDomain } from '../../domains/consent.confirm.domain';
 import { ConsentService } from './consent.service';
 import { SigninService } from './signin.service';
 import { LoginDomain } from '../../domains/login.domain';
+import { NotEmptyStringPipe } from '../../shared/pipes/not.empty.string.pipe';
 
 @Controller()
 export class AuthController {
@@ -74,7 +75,7 @@ export class AuthController {
   }
 
   @Get('login')
-  async login(@Query('login_challenge') challenge: string, @Req() req, @Res() res) {
+  async login(@Query('login_challenge', new NotEmptyStringPipe()) challenge: string, @Req() req, @Res() res) {
     const { skip, subject } = await this.loginService.getLoginRequest(challenge);
 
     if (skip) {
@@ -86,13 +87,16 @@ export class AuthController {
 
   @Post('login')
   async loginWithCredentials(@Body() credentialsDto: LoginDomain, @Req() req, @Res() res) {
-    const { email, password, challenge, remember } = credentialsDto;
-    try{
+    const { email, password, challenge, remember, submit } = credentialsDto;
+
+    if (submit === 'Deny access') {
+      return res.redirect( await this.loginService.rejectLoginRequest(challenge));
+    }
+
+    try {
       const user = await this.authService.validateUser(email, password);
-      return res.redirect(
-        await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)),
-      );
-    }catch(error){
+      return res.redirect(await this.loginService.acceptLoginRequestAndRemember(challenge, credentialsDto.email, Boolean(remember)));
+    } catch(error) {
       return res.render('login', { challenge, error: 'The username / password combination is not correct' });
     }
   }

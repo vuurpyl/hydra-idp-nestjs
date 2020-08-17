@@ -17,4 +17,7 @@ export class LoginDomain {
   @IsOptional()
   @IsString()
   remember: string;
+
+  @IsString()
+  submit: string;
 }

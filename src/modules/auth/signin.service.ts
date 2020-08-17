@@ -23,4 +23,13 @@ export class SigninService {
     const { redirect_to } = await this.hydraService.acceptLoginRequest( challenge, body );
     return redirect_to;
   }
+
+  async rejectLoginRequest(challenge: string): Promise<string> {
+    const body = {
+      error: 'access_denied',
+      errorDescription: 'The resource owner denied the request'
+    };
+    const { redirect_to } = await this.hydraService.rejectLoginRequest(challenge, body);
+    return redirect_to;
+  }
 }
