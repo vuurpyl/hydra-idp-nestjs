@@ -6,10 +6,7 @@ export class HydraService {
   constructor(private readonly httpService: HttpService) {}
 
   httpOptions = {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Forwarded-Proto': 'https'
-    }
+
   };
 
   public async getLoginRequest(challenge) {
@@ -63,6 +60,7 @@ export class HydraService {
       const { data } = await this.httpService.get(url, this.httpOptions).toPromise();
       return data;
     } catch (error) {
+      console.log(error)
       throw new InternalServerErrorException(error);
     }
   }

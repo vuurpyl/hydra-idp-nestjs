@@ -6,7 +6,6 @@ import { ConsentConfirmDomain } from '../../domains/consent.confirm.domain';
 import { ConsentService } from './consent.service';
 import { SigninService } from './signin.service';
 import { LoginDomain } from '../../domains/login.domain';
-import { NotEmptyStringPipe } from '../../shared/pipes/not.empty.string.pipe';
 
 @Controller()
 export class AuthController {
@@ -75,7 +74,7 @@ export class AuthController {
   }
 
   @Get('login')
-  async login(@Query('login_challenge', new NotEmptyStringPipe()) challenge: string, @Req() req, @Res() res) {
+  async login(@Query('login_challenge') challenge: string, @Req() req, @Res() res) {
     const { skip, subject } = await this.loginService.getLoginRequest(challenge);
 
     if (skip) {

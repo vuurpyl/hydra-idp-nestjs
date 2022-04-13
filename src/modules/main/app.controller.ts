@@ -7,8 +7,8 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('/app')
   root(): string {
-    return this.appService.root();
+    return 'totoooo';
   }
 }

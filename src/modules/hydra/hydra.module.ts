@@ -4,7 +4,7 @@ import { HydraService } from './hydra.service';
 @Module({
   imports: [
     HttpModule.register({
-      baseURL: `http://hydra-idp-management_hydra_1:4445`,
+      baseURL: `http://127.0.0.1:4445`,
     }),
   ],
   providers: [HydraService],

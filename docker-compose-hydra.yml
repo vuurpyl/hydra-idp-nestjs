@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 services:
   postgreshydra:
     image: postgres:latest
@@ -17,7 +17,7 @@ services:
       - "4445:4445" # Admin port
       - "5555:5555" # Port for hydra token user
     command:
-      serve all --dangerous-force-http
+      serve all --dangerous-force-http --config /hydra.yml
     environment:
       - URLS_SELF_ISSUER=http://localhost:4444/
       - URLS_CONSENT=http://localhost:3000/consent
@@ -28,9 +28,17 @@ services:
       - SECRETS_SYSTEM=youReallyNeedToChangeThis
       - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
       - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
+      - SERVE_PUBLIC_CORS_ENABLED=true
+      - SERVE_PUBLIC_CORS_ALLOWED_METHODS=POST,GET,PUT,DELETE
+      - SERVE_ADMIN_CORS_ENABLED=true
+      - SERVE_ADMIN_CORS_ALLOWED_METHODS=POST,GET,PUT,DELETE
     restart: unless-stopped
+    volumes:
+      - "./config/hydra.yml:/hydra.yml"
     networks:
       - intranet_hydra
+
+
   hydra-migrate:
     image: oryd/hydra:latest
     environment:
